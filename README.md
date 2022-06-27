@@ -131,3 +131,195 @@ Of course sshpass has to be installed with the below command
 sudo apt install sshpass
 
 -p 2244 is a nonstandard ssh port
+
+See the mikrotik.sh file
+
+Then edit crontab
+
+crontab -e
+
+and add the below entry to run every minute:
+
+*/1 * * * * /root/mikrotik.sh
+
+
+I created a nut user on a mikrotik and additionally tested it with RSA keys without a passphrase what in LAN is let's say secure enough. All you have to do is to save private and public key in openSSH format, but not the newest one, but instead the standard format - hope I explained it well, just because Puttygen allow syou to save the RSA key in new openSSH format. Anyway you have to upload the private key into the Files in mikrotik, and then in system - users section im port the key for a user. But you can also just use ordinary password with sshpass as I did in the password. If yopu want use RSA, you have to remove this from bash script: 
+
+sshpass -f /root/creds
+
+Then you have to add the below line to crontab for root account but it can be also a pi user and it will run every one minute.
+
+#For the root user
+*/1 * * * * root /root/mikrotik.sh 
+
+he default system logger is rsyslog. Add the following to /etc/rsyslog.d/99-nut.conf
+
+:syslogtag,contains,"upsmon" /var/log/nut.log
+:syslogtag,contains,"nut" /var/log/nut.log
+:syslogtag,contains,"upssched" /var/log/nut.log
+
+
+Then perform the below commands:
+
+touch /var/log/nut.log
+chown root:adm /var/log/nut.log
+chmod 640 /var/log/nut.log
+systemctl restart rsyslog
+
+All the nut logs will go there.
+
+dmesg
+
+entered blocking, disabled , forwarding state
+
+vim /etc/udev/rules.d/99-nut-ups.rules
+
+SUBSYSTEM!="USB", GOTO="nut-usbups_rules_end"
+
+# Green Cell
+ACTION=="add|change", SUBSYSTEM=="usb_device", SUBSYSTEMS=="usb_device", ATTR{idVendor}=="0001"
+
+LABEL="nut-usbups_rules_end"
+
+
+
+
+In the file /etc/nut/upssched.conf I defined below actions
+Code: Select all
+AT ONBATT * START-TIMER onbatt 300
+AT ONLINE * CANCEL-TIMER onbatt online
+AT ONBATT * START-TIMER earlyshutdown 180
+AT ONLINE * CANCEL-TIMER earlyshutdown
+AT LOWBATT * START-TIMER shutdowncritical 30
+AT ONLINE * CANCEL-TIMER shutdowncritical
+AT COMMBAD * START-TIMER commbad 30
+AT COMMOK * CANCEL-TIMER commbad commok
+AT REPLBATT * EXECUTE replacebatt
+
+Early shutdown I have set to 180 seconds. 
+
+And the /bin/upssched-cmd file contains the below:
+
+case $1 in
+       onbatt)
+          logger -t upssched-cmd "The UPS is on battery"
+          ;;
+       online)
+          logger -t upssched-cmd "The UPS is back on power"
+          ;;
+       commbad)
+       logger -t upssched-cmd "The server lost communication with UPS"
+          ;;
+       commok)
+          logger -t upssched-cmd "The server re-establish communication with UPS"
+          ;;
+       earlyshutdown)
+          logger -t upssched-cmd "UPS on battery too long, forced Mikrotik shutdown"
+          ;;
+       shutdowncritical)
+          logger -t upssched-cmd "UPS on battery critical, forced shutdown"
+          /usr/sbin/upsmon -c fsd
+          ;;
+       upsgone)
+          logger -t upssched-cmd "The UPS has been gone for awhile"
+          ;;
+       replacebatt)
+          logger -t upssched-cmd "The UPS needs new battery"
+          ;;
+       *)
+          logger -t upssched-cmd "Unrecognized command: $1"
+          ;;
+ esac
+
+My bash script catches the Mikrotik phrase from the log. I had to test it to be sure for 100% it is working as expected.
+
+Finally I have it working and the Raspberry Pi is shutting down as it should. 
+
+
+
+Sending e-mails
+
+
+Install th below tools:
+
+sudo apt install postfix mailutils
+
+
+vim /etc/postfix/main.cf
+
+
+# See /usr/share/postfix/main.cf.dist for a commented, more complete version
+
+
+# Debian specific:  Specifying a file name will cause the first
+# line of that file to be used as the name.  The Debian default
+# is /etc/mailname.
+#myorigin = /etc/mailname
+
+smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
+biff = no
+
+# appending .domain is the MUA's job.
+append_dot_mydomain = no
+
+# Uncomment the next line to generate "delayed mail" warnings
+#delay_warning_time = 4h
+
+readme_directory = no
+
+# See http://www.postfix.org/COMPATIBILITY_README.html -- default to 2 on
+# fresh installs.
+compatibility_level = 2
+
+
+
+# TLS parameters
+smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+smtpd_tls_security_level=may
+
+smtp_tls_CApath=/etc/ssl/certs
+smtp_tls_security_level=may
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+
+
+smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_unauth_destination reject_unauth_destination
+myhostname = raspberrypi
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+mydestination = raspberrypi, localhost.localdomain, localdomain
+relayhost =
+mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+mailbox_size_limit = 0
+recipient_delimiter =
+inet_interfaces = all
+inet_protocols = ipv4
+default_transport = smtp
+relay_transport = smtp
+
+
+vim /etc/aliases
+
+and add at the end 
+
+root: your-email address@example.com
+
+Perform the below command
+
+postconf | grep config_directory
+
+Create emailnotify.sh in /root
+
+Then set it as executable
+
+chmod +x emailnotify.sh
+
+Then edit crontab
+
+crontab -e
+
+and add the below entry:
+
+@reboot /root/emailnotify.sh
+
+Now if the UPS will go down you will be notified and also when the raspberry pi will boot up.
