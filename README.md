@@ -60,6 +60,8 @@ Add users
 
 If a help is needed with any part, do not hesitate to ask.
 
+# Home Assistant
+
 I had to set up Home Assistant as the docker container on a raspberry Pi and add my Green Cell UPS there.
 I had to do that because I am using AdGuard Home on a Raspberry Pi and I was not able to run it together.
 
@@ -69,6 +71,8 @@ vim home-assistant.yml
 See home-assistant.yml file
 
 Then run the below commands
+
+# Install and configure Docker and Docker Compose
 
 The first one installs the docker
 sudo curl -sSL https://get.docker.com | sh
@@ -86,6 +90,9 @@ sudo systemctl enable docker
 And start and check the status
 sudo systemctl start docker
 sudo systemctl status docker
+
+
+# Home Assistant Docker container
 
 Create a docker containter with Home Assistant that runs locally
 
@@ -143,10 +150,7 @@ Then you have to add the below line to crontab for root account but it can be al
 
 he default system logger is rsyslog. Add the following to /etc/rsyslog.d/99-nut.conf
 
-:syslogtag,contains,"upsmon" /var/log/nut.log
-:syslogtag,contains,"nut" /var/log/nut.log
-:syslogtag,contains,"upssched" /var/log/nut.log
-
+See 99-nut.conf file
 
 Then perform the below commands:
 
