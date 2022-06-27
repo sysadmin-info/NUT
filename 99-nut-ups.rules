@@ -1,0 +1,6 @@
+SUBSYSTEM!="USB", GOTO="nut-usbups_rules_end"
+
+# Green Cell
+ACTION=="add|change", SUBSYSTEM=="usb_device", SUBSYSTEMS=="usb_device", ATTR{idVendor}=="0001"
+
+LABEL="nut-usbups_rules_end"
