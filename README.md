@@ -175,17 +175,11 @@ To get rid this from rsyslog I performed the below steps:
 
 vim /etc/udev/rules.d/99-nut-ups.rules
 
-SUBSYSTEM!="USB", GOTO="nut-usbups_rules_end"
-
-## Green Cell
-ACTION=="add|change", SUBSYSTEM=="usb_device", SUBSYSTEMS=="usb_device", ATTR{idVendor}=="0001"
-
-LABEL="nut-usbups_rules_end"
+See 99-nut-ups.rules file
 
 
+In the file /etc/nut/upssched.conf I defined below actions:
 
-In the file /etc/nut/upssched.conf I defined below actions
-Code: Select all
 AT ONBATT * START-TIMER onbatt 300
 AT ONLINE * CANCEL-TIMER onbatt online
 AT ONBATT * START-TIMER earlyshutdown 180
