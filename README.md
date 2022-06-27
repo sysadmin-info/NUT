@@ -149,7 +149,6 @@ sshpass -f /root/creds
 
 Then you have to add the below line to crontab for root account but it can be also a pi user and it will run every one minute.
 
-#For the root user
 */1 * * * * root /root/mikrotik.sh 
 
 he default system logger is rsyslog. Add the following to /etc/rsyslog.d/99-nut.conf
@@ -168,19 +167,20 @@ systemctl restart rsyslog
 
 All the nut logs will go there.
 
-dmesg
+dmesg presented the below types of alerts
 
-entered blocking, disabled , forwarding state
+"entered blocking, disabled , forwarding state"
+
+To get rid this from rsyslog I performed the below steps:
 
 vim /etc/udev/rules.d/99-nut-ups.rules
 
 SUBSYSTEM!="USB", GOTO="nut-usbups_rules_end"
 
-# Green Cell
+## Green Cell
 ACTION=="add|change", SUBSYSTEM=="usb_device", SUBSYSTEMS=="usb_device", ATTR{idVendor}=="0001"
 
 LABEL="nut-usbups_rules_end"
-
 
 
 
@@ -237,7 +237,7 @@ Finally I have it working and the Raspberry Pi is shutting down as it should.
 
 
 
-Sending e-mails
+# Sending e-mails
 
 
 Install th below tools:
@@ -248,32 +248,32 @@ sudo apt install postfix mailutils
 vim /etc/postfix/main.cf
 
 
-# See /usr/share/postfix/main.cf.dist for a commented, more complete version
+## See /usr/share/postfix/main.cf.dist for a commented, more complete version
 
 
-# Debian specific:  Specifying a file name will cause the first
-# line of that file to be used as the name.  The Debian default
-# is /etc/mailname.
-#myorigin = /etc/mailname
+## Debian specific:  Specifying a file name will cause the first
+## line of that file to be used as the name.  The Debian default
+## is /etc/mailname.
+## myorigin = /etc/mailname
 
 smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
 biff = no
 
-# appending .domain is the MUA's job.
+## appending .domain is the MUA's job.
 append_dot_mydomain = no
 
-# Uncomment the next line to generate "delayed mail" warnings
-#delay_warning_time = 4h
+## Uncomment the next line to generate "delayed mail" warnings
+##delay_warning_time = 4h
 
 readme_directory = no
 
-# See http://www.postfix.org/COMPATIBILITY_README.html -- default to 2 on
-# fresh installs.
+## See http://www.postfix.org/COMPATIBILITY_README.html -- default to 2 on
+## fresh installs.
 compatibility_level = 2
 
 
 
-# TLS parameters
+## TLS parameters
 smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
 smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
 smtpd_tls_security_level=may
