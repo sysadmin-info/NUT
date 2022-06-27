@@ -68,7 +68,7 @@ I had to do that because I am using AdGuard Home on a Raspberry Pi and I was not
 First I had to create a yaml file
 vim home-assistant.yml
 
-See home-assistant.yml file
+- See home-assistant.yml file
 
 Then run the below commands
 
@@ -129,7 +129,7 @@ sudo apt install sshpass
 
 -p 2244 is a nonstandard ssh port
 
-See the mikrotik.sh file
+- See the mikrotik.sh file
 
 Then edit crontab
 
@@ -150,7 +150,7 @@ Then you have to add the below line to crontab for root account but it can be al
 
 he default system logger is rsyslog. Add the following to /etc/rsyslog.d/99-nut.conf
 
-See 99-nut.conf file
+- See 99-nut.conf file
 
 Then perform the below commands:
 
@@ -169,61 +169,22 @@ To get rid this from rsyslog I performed the below steps:
 
 vim /etc/udev/rules.d/99-nut-ups.rules
 
-See 99-nut-ups.rules file
+- See 99-nut-ups.rules file
 
 
 In the file /etc/nut/upssched.conf I defined below actions:
 
-AT ONBATT * START-TIMER onbatt 300
-AT ONLINE * CANCEL-TIMER onbatt online
-AT ONBATT * START-TIMER earlyshutdown 180
-AT ONLINE * CANCEL-TIMER earlyshutdown
-AT LOWBATT * START-TIMER shutdowncritical 30
-AT ONLINE * CANCEL-TIMER shutdowncritical
-AT COMMBAD * START-TIMER commbad 30
-AT COMMOK * CANCEL-TIMER commbad commok
-AT REPLBATT * EXECUTE replacebatt
+- See upssched.conf file
 
 Early shutdown I have set to 180 seconds. 
 
 And the /bin/upssched-cmd file contains the below:
 
-case $1 in
-       onbatt)
-          logger -t upssched-cmd "The UPS is on battery"
-          ;;
-       online)
-          logger -t upssched-cmd "The UPS is back on power"
-          ;;
-       commbad)
-       logger -t upssched-cmd "The server lost communication with UPS"
-          ;;
-       commok)
-          logger -t upssched-cmd "The server re-establish communication with UPS"
-          ;;
-       earlyshutdown)
-          logger -t upssched-cmd "UPS on battery too long, forced Mikrotik shutdown"
-          ;;
-       shutdowncritical)
-          logger -t upssched-cmd "UPS on battery critical, forced shutdown"
-          /usr/sbin/upsmon -c fsd
-          ;;
-       upsgone)
-          logger -t upssched-cmd "The UPS has been gone for awhile"
-          ;;
-       replacebatt)
-          logger -t upssched-cmd "The UPS needs new battery"
-          ;;
-       *)
-          logger -t upssched-cmd "Unrecognized command: $1"
-          ;;
- esac
+- See upssched-cmd file
 
 My bash script catches the Mikrotik phrase from the log. I had to test it to be sure for 100% it is working as expected.
 
 Finally I have it working and the Raspberry Pi is shutting down as it should. 
-
-
 
 # Sending e-mails
 
@@ -232,11 +193,9 @@ Install th below tools:
 
 sudo apt install postfix mailutils
 
-
 vim /etc/postfix/main.cf
 
-see the main.cf file
-
+- See the main.cf file
 
 vim /etc/aliases
 
