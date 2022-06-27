@@ -66,17 +66,7 @@ I had to do that because I am using AdGuard Home on a Raspberry Pi and I was not
 First I had to create a yaml file
 vim home-assistant.yml
 
-version: '3'
-services:
-  homeassistant:
-    container_name: homeassistant
-    image: "ghcr.io/home-assistant/home-assistant:stable"
-    volumes:
-      - /home/adrian/home-assistant/config
-      - /etc/localtime:/etc/localtime:ro
-    restart: unless-stopped
-    privileged: true
-    network_mode: host
+See home-assistant.yml file
 
 Then run the below commands
 
