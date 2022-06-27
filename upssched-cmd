@@ -1,0 +1,31 @@
+#!/bin/sh
+case $1 in
+       onbatt)
+          logger -t upssched-cmd "The UPS is on battery"
+          ;;
+       online)
+          logger -t upssched-cmd "The UPS is back on power"
+          ;;
+       commbad)
+       logger -t upssched-cmd "The server lost communication with UPS"
+          ;;
+       commok)
+          logger -t upssched-cmd "The server re-establish communication with UPS"
+          ;;
+       earlyshutdown)
+          logger -t upssched-cmd "UPS on battery too long, forced Mikrotik shutdown"
+          ;;
+       shutdowncritical)
+          logger -t upssched-cmd "UPS on battery critical, forced shutdown"
+          /usr/sbin/upsmon -c fsd
+          ;;
+       upsgone)
+          logger -t upssched-cmd "The UPS has been gone for awhile"
+          ;;
+       replacebatt)
+          logger -t upssched-cmd "The UPS needs new battery"
+          ;;
+       *)
+          logger -t upssched-cmd "Unrecognized command: $1"
+          ;;
+ esac
