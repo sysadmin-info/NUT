@@ -2,12 +2,14 @@
 
 sleep 60
 
-IP=`echo $(ifconfig eth0 | grep 'inet' | cut -d: -f2 | awk '{ print $2}')`
+IP=`echo $(hostname -I | awk '{ print $1}')`
 HOSTNAME=`hostname -f`
 echo "$HOSTNAME online.  IP address: $IP" > /root/email.txt
 echo >> /root/email.txt
 date >> /root/email.txt
+echo "$HOSTNAME is up" >> /root/emailmessage.txt
 
-echo "$HOSTNAME is up" | mail -A /root/email.txt -s "$HOSTNAME online" adrian.ambroziak@gmail.com
+mutt -a /root/email.txt -s "$HOSTNAME online" -- example@gmail.com < /root/emailmessage.txt
 
-rm -rf /root/email.txt
+rm -r /root/email.txt
+rm -f /root/emailmessage.txt
