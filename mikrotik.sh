@@ -19,7 +19,7 @@ if [ "`grep -a "Mikrotik" "$nutlog"`" ]; then
         # I am using id_rsa private key to connect. id_rsa.pub is uploaded to Mikrotik.
         # In Mikrotik go to IP -> Services -> Enable ssh, set port and set IP allowed IP address or range
         # In Mikrotik go to System -> Users add for example a user: nut, set up allowed IP and then import SSH public key usin SSH keys tab.
-        ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o CheckHostIP=no -p 2244 -i /root/.ssh/id_rsa nut@10.10.0.1 "/system shutdown; /y; /quit;"
+        ssh -p 2244 -i /root/.ssh/id_rsa nut@10.10.0.1 "/system shutdown; /y; /quit;"
         exit
 else
         echo "$data -> Mikrotik router will remain powered on."
