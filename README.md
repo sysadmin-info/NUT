@@ -57,6 +57,7 @@ and add at the end opf file:
         runtimecal = 600,100,1200,50
         chargetime = 28800
         idleload = 10
+        override.ups.realpower.nominal = 360
 ```
 
 You can make a backup of this file or modify it. 
