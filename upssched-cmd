@@ -17,10 +17,10 @@ case $1 in
           logger -t upssched-cmd "The UPS is back on power"
           ;;
        commbad)
-       logger -t upssched-cmd "The server lost communication with UPS"
+          logger -t upssched-cmd "The server lost communication with UPS"
           ;;
        commok)
-          logger -t upssched-cmd "The server re-establish communication with UPS"
+          logger -t upssched-cmd "The server re-established communication with UPS"
           ;;
        earlyshutdown)
           logger -t upssched-cmd "UPS on battery too long, forced Mikrotik shutdown"
@@ -28,14 +28,24 @@ case $1 in
        shutdowncritical)
           logger -t upssched-cmd "UPS on battery critical, forced shutdown"
           /usr/sbin/upsmon -c fsd
+          if [ $? -ne 0 ]; then
+              logger -t upssched-cmd "Failed to execute shutdown command"
+          fi
           ;;
        upsgone)
-          logger -t upssched-cmd "The UPS has been gone for awhile"
+          logger -t upssched-cmd "The UPS has been gone for a while"
           ;;
        replacebatt)
-          logger -t upssched-cmd "The UPS needs new battery"
+          logger -t upssched-cmd "The UPS needs a new battery"
+          ;;
+       powerdown)
+          logger -t upssched-cmd "Powerdown"
+          /usr/sbin/upsmon -c fsd
+          if [ $? -ne 0 ]; then
+              logger -t upssched-cmd "Failed to execute powerdown command"
+          fi
           ;;
        *)
           logger -t upssched-cmd "Unrecognized command: $1"
           ;;
- esac
+esac
