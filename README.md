@@ -46,18 +46,21 @@ and add at the end opf file:
         productid = "0000"
         product = "MEC0003"
         vendor = "MEC"
-        bus = "001"
+        bus = "003"
         desc = "UPS Green Cell AiO 600VA 360W"
         pollinterval = 5
         override.battery.charge.low = 30
         override.battery.charge.warning = 35
+        override.battery.runtime.low = 450
+        override.ups.delay.shutdown = 150
+        override.ups.delay.start = 60
+        override.ups.realpower.nominal = 360
         override.battery.voltage.low = 10.400000
         override.battery.voltage.high = 13.000000
         override.battery.packs = 12
         runtimecal = 600,100,1200,50
         chargetime = 28800
         idleload = 10
-        override.ups.realpower.nominal = 360
 ```
 
 You can make a backup of this file or modify it. 
